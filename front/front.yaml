@@ -19,7 +19,7 @@ metadata:
   name: wordpress
   namespace: todo
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: wordpress
