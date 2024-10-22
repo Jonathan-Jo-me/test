@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  namespace: todo
+  labels:
+    app: wordpress
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: wordpress
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  namespace: todo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+      - image: wordpress:latest
+        name: wordpress
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: "mysql.db.svc.cluster.local:3306" # Cross-namespace DNS
+        - name: WORDPRESS_DB_USER # <service-name>.<namespace>.svc.cluster.local:<port>
+          value: "wpuser"
+        - name: WORDPRESS_DB_PASSWORD
+          value: "wppassword"
+        - name: WORDPRESS_DB_NAME
+          value: "wordpress"
+        ports:
+        - containerPort: 80 # kubectl get svc -n todo
